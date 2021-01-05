@@ -135,15 +135,11 @@ namespace PosServer
         {
             //Message m1 = new Message { From = "22", To = "11", Msg = "Adeu!", Stamp = "A.E." }
             //TODO: Add Message
-            List<Message> datos = new List<Message>();
             if(!repo.ContainsKey(message.To)){
-                repo.Add(message.To, datos);
+                repo.Add(message.To, new List<Message>());
             }
             else{
-                datos.Add(message.From);
-                datos.Add(message.Msg);
-                datos.Add(message.Stamp);
-                repo.Add(message.To, datos);
+                repo.Add(message.To, message);
             }
 
         }
@@ -156,7 +152,7 @@ namespace PosServer
             for (int i = 0; i < repo.Count; i ++){
                 if(repo.ContainsKey[toClient]){
                     foreach(Message msg in repo[toClient]){
-                        sb.append($"[{i}] From: {msg.From}\n");
+                        sb.Append($"[{i}] From: {msg.From}\n");
                     }
                 }
             }
@@ -169,7 +165,7 @@ namespace PosServer
 
             //TODO: Retr Message
             if(repo.ContainsKey[toClient]){
-                msg = repo[toClient][index]
+                msg = repo[toClient][index];
                 repo.remove(toClient);
             }
 
@@ -182,11 +178,11 @@ namespace PosServer
 
             //TODO: Process
             if(request.to != "0"){
-                AddMessage(request)
+                AddMessage(request);
                 response.msg = "OK";
             }
             else{
-                arrayAux = request.msg.split(" ");
+                String[] arrayAux = request.msg.split(" ");
                 switch(arrayAux[0]){
 
                     case "LIST":
