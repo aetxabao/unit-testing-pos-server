@@ -168,6 +168,10 @@ namespace PosServer
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
             //TODO: Retr Message
+            if(repo.ContainsKey[toClient]){
+                msg = repo[toClient][index]
+                repo.remove(toClient);
+            }
 
             return msg;
         }
