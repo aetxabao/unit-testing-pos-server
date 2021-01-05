@@ -160,8 +160,6 @@ namespace PosServer
                     }
                 }
             }
-
-
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
 
@@ -179,6 +177,24 @@ namespace PosServer
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
             //TODO: Process
+            if(request.to != "0"){
+                AddMessage(request)
+                response.msg = "OK";
+            }
+            else{
+                arrayAux = request.msg.split(" ");
+                switch(arrayAux[0]){
+
+                    case "LIST":
+                        response = ListMessages(request.From);
+                        break;
+
+                    case "RETR":
+                        response = RetrMessage(request.From, arrayAux[1]);
+                        break;
+                }
+            }
+            
 
             return response;
         }
