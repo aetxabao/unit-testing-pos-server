@@ -134,6 +134,13 @@ namespace PosServer
         public static void AddMessage(Message message)
         {
             //TODO: Add Message
+            if (repo.ContainsKey(message.To)){
+                repo[message.To].Add(message);
+            }
+            else{
+                repo.Add(message.To, new List<Message>{message});
+            }
+
         }
 
         public static Message ListMessages(string toClient)
@@ -141,6 +148,11 @@ namespace PosServer
             StringBuilder sb = new StringBuilder();
 
             //TODO: List Messages
+            int i = 0;
+            foreach(Message m in repo[toClient]){
+                sb.Append("["+ i +"] " + m + "\n");
+                i++;
+            }
 
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
@@ -151,6 +163,11 @@ namespace PosServer
 
             //TODO: Retr Message
 
+            if(repo.ContainsKey(toClient) && repo[toClient].Count > index && index >= 0){
+                msg.Msg = repo[toClient][index].Msg;
+                repo[toClient].RemoveAt(index);
+            }
+
             return msg;
         }
 
@@ -159,7 +176,24 @@ namespace PosServer
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
             //TODO: Process
+            if(request.To == "0"){
+                int numMessage;
+                if(request.Msg == "LIST"){
+                    response = ListMessages(request.From);
+                }
+                else if(request.Msg.Contains("RETR ") && Int32.TryParse(request.Msg.Substring(5), out numMessage)){
+                    if(Convert.ToInt32(numMessage) >= 0){
+                        response = RetrMessage(request.From, Convert.ToInt32(numMessage));
+                    }
+                }
+               
+            }
+            else{
+                AddMessage(request);
 
+                response.Msg = "OK";
+            }
+            
             return response;
         }
 
