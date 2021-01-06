@@ -134,6 +134,13 @@ namespace PosServer
         public static void AddMessage(Message message)
         {
             //TODO: Add Message
+            if(repo.ContainsKey(message.To)){
+                repo[message.To].Add(message);
+            }else{
+                List<Message> list = new List<Message>();
+                list.Add(message);
+                repo.Add(message.To, list);
+            }
         }
 
         public static Message ListMessages(string toClient)
@@ -159,6 +166,17 @@ namespace PosServer
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
             //TODO: Process
+            if(request.To != "0"){
+                // Si el cliente ha decidido enviar un mensaje
+                AddMessage(request);
+            }else{
+                String cuerpo = request.Msg;
+                if(cuerpo == "LIST"){
+                    ListMessages(request.From);
+                }else{
+
+                }
+            }
 
             return response;
         }
