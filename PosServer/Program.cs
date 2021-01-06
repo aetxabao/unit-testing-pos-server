@@ -133,8 +133,6 @@ namespace PosServer
 
         public static Message AddMessage(Message message)
         {
-            //TODO: Add Message
-
             Message msg = new Message { From = "0", To = message.From, Msg = "OK", Stamp = "Server" };
 
             if(repo.ContainsKey(message.To)){
@@ -184,20 +182,28 @@ namespace PosServer
         {
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
-            //TODO: Process
+            //TODO: Correct Process
             if(request.To != "0"){
-                // Si el cliente ha decidido enviar un mensaje. Acciones
                 response = AddMessage(request);
             }else{
                 String cuerpo = request.Msg;
                 if(cuerpo == "LIST"){
                     response = ListMessages(request.From);
-                }else if(cuerpo.Contains("RETR")){
-                    int index = Int32.Parse(request.Msg.Split(" ")[1]);
-                    response = RetrMessage(request.From, index);
+                }
+                if(cuerpo.Split()[0] == "RETR"){
+                    string indexString = request.Msg.Split()[1];
+                    bool isInt = int.TryParse(indexString, out _);
+                    int index = -1;
+                    if(isInt){
+                        index = int.Parse(indexString);
+                    }
+                    if(index >= 0){
+                        response = RetrMessage(request.From, index);
+                    }
                 }
             }
-
+            
+            Console.WriteLine(response.ToString());
             return response;
         }
 
