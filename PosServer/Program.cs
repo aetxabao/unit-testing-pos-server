@@ -167,7 +167,7 @@ namespace PosServer
 
             //TODO: Process
             if(request.To != "0"){
-                // Si el cliente ha decidido enviar un mensaje
+                // Si el cliente ha decidido enviar un mensaje. Acciones
                 AddMessage(request);
             }else{
                 String cuerpo = request.Msg;
