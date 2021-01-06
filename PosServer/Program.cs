@@ -131,9 +131,12 @@ namespace PosServer
             return response;
         }
 
-        public static void AddMessage(Message message)
+        public static Message AddMessage(Message message)
         {
             //TODO: Add Message
+
+            Message msg = new Message { From = "0", To = message.From, Msg = "OK", Stamp = "Server" };
+
             if(repo.ContainsKey(message.To)){
                 repo[message.To].Add(message);
             }else{
@@ -141,13 +144,23 @@ namespace PosServer
                 list.Add(message);
                 repo.Add(message.To, list);
             }
+
+            return msg;
         }
 
         public static Message ListMessages(string toClient)
         {
             StringBuilder sb = new StringBuilder();
 
-            //TODO: List Messages
+            if(repo.ContainsKey(toClient)){
+                List<Message> listMsg = repo[toClient];
+                for (int i = 0; i < listMsg.Count; i++)
+                {
+                    sb.AppendFormat("[{0}] From: {1}\n", i, listMsg[i].From);
+                }
+            }else{
+                sb.Append("");
+            }
 
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
@@ -168,11 +181,11 @@ namespace PosServer
             //TODO: Process
             if(request.To != "0"){
                 // Si el cliente ha decidido enviar un mensaje. Acciones
-                AddMessage(request);
+                response = AddMessage(request);
             }else{
                 String cuerpo = request.Msg;
                 if(cuerpo == "LIST"){
-                    ListMessages(request.From);
+                    response = ListMessages(request.From);
                 }else{
 
                 }
