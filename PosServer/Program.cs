@@ -169,7 +169,13 @@ namespace PosServer
         {
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
-            //TODO: Retr Message
+            if(repo.ContainsKey(toClient)){
+                List<Message> lstMsg = repo[toClient];
+                if(index <= (lstMsg.Count - 1)){
+                    msg = lstMsg[index];
+                    lstMsg.RemoveAt(index);
+                }
+            }
 
             return msg;
         }
@@ -186,8 +192,9 @@ namespace PosServer
                 String cuerpo = request.Msg;
                 if(cuerpo == "LIST"){
                     response = ListMessages(request.From);
-                }else{
-
+                }else if(cuerpo.Contains("RETR")){
+                    int index = Int32.Parse(request.Msg.Split(" ")[1]);
+                    response = RetrMessage(request.From, index);
                 }
             }
 
