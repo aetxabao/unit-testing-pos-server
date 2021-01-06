@@ -182,7 +182,6 @@ namespace PosServer
         {
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
-            //TODO: Correct Process
             if(request.To != "0"){
                 response = AddMessage(request);
             }else{
@@ -202,8 +201,6 @@ namespace PosServer
                     }
                 }
             }
-            
-            Console.WriteLine(response.ToString());
             return response;
         }
 
