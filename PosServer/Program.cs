@@ -134,15 +134,32 @@ namespace PosServer
         public static void AddMessage(Message message)
         {
             //TODO: Add Message
+            if(repo.ContainsKey(message.To)){
+                repo[message.To].Add(message);
+            }else {
+                List<Message> lst = new List<Message>();
+                lst.Add(message);
+                repo.Add(message.To, lst);
+            }
         }
 
         public static Message ListMessages(string toClient)
         {
             StringBuilder sb = new StringBuilder();
-
             //TODO: List Messages
+            try
+            {
+                List<Message> numCorreos = repo[toClient];
+                sb.AppendFormat("Tienes {0} Mensajes", numCorreos.Count);
+                return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };  
+            }
+            catch (System.Exception)
+            {
+                sb.Append("El usuario no existe");
+                return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
+            }
 
-            return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
+            
         }
 
         public static Message RetrMessage(string toClient, int index)
@@ -156,11 +173,23 @@ namespace PosServer
 
         public static Message Process(Message request)
         {
-            Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
-
             //TODO: Process
+            try{
+                Message response = new Message();
+                if(request.Msg == "LIST"){
+                    response = ListMessages(request.From);
+                }else if(request.To.Contains("RETR")){
 
-            return response;
+                }else{
+                    //Añadir mensage
+                    AddMessage(request);
+                    response = new Message { From = "0", To = request.From, Msg = "OK", Stamp = "Server" };
+                }
+                return response;
+            } catch {
+                return new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
+            }
+
         }
 
         public static int Main(String[] args)
