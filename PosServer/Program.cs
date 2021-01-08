@@ -177,26 +177,30 @@ namespace PosServer
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
             //TODO: Process
-            if(request.to != "0"){
+            try
+            {
+                if(request.to != "0"){
                 AddMessage(request);
                 response.msg = "OK";
-            }
-            else{
-                String[] arrayAux = request.msg.split(" ");
-                switch(arrayAux[0]){
+                }
+                else{
+                    String[] arrayAux = request.msg.split(" ");
+                    switch(arrayAux[0]){
 
-                    case "LIST":
-                        response = ListMessages(request.From);
-                        break;
+                        case "LIST":
+                            response = ListMessages(request.From);
+                            break;
 
-                    case "RETR":
-                        response = RetrMessage(request.From, arrayAux[1]);
-                        break;
+                        case "RETR":
+                            response = RetrMessage(request.From, arrayAux[1]);
+                            break;
+                    }
                 }
             }
-            
-
-            return response;
+            catch (System.Exception)
+            {
+                return response;
+            } 
         }
 
         public static int Main(String[] args)
