@@ -147,7 +147,11 @@ namespace PosServer
             StringBuilder sb = new StringBuilder();
 
             //TODO: List Messages
-            
+            int cont = 0;
+            foreach (Message msg in repo[toClient]) {
+                sb.Append("[ " + cont + "] " + msg + "\n");
+                cont++;
+            }
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
 
