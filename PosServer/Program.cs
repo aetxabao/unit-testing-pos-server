@@ -160,7 +160,13 @@ namespace PosServer
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
             //TODO: Retr Message
-            
+            if (repo.ContainsKey(toClient)) {
+                List<Message> lstMessages = repo[toClient];
+                if (index <= lstMessages.Count - 1) {
+                    msg = lstMessages[index];
+                    lstMessages.RemoveAt(index);
+                }
+            }
             return msg;
         }
 
@@ -169,7 +175,7 @@ namespace PosServer
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
             //TODO: Process
-
+            
             return response;
         }
 
