@@ -139,7 +139,7 @@ namespace PosServer
                 repo.Add(message.To, new List<Message>());
             }
             else{
-                repo.Add(message.To, message);
+                repo[message.To].Add(message);
             }
 
         }
@@ -150,7 +150,7 @@ namespace PosServer
 
             //TODO: List Messages
             for (int i = 0; i < repo.Count; i ++){
-                if(repo.ContainsKey[toClient]){
+                if(repo.ContainsKey(toClient)){
                     foreach(Message msg in repo[toClient]){
                         sb.Append($"[{i}] From: {msg.From}\n");
                     }
@@ -164,9 +164,9 @@ namespace PosServer
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
             //TODO: Retr Message
-            if(repo.ContainsKey[toClient]){
+            if(repo.ContainsKey(toClient)){
                 msg = repo[toClient][index];
-                repo.remove(toClient);
+                repo.Remove(toClient);
             }
 
             return msg;
@@ -179,12 +179,12 @@ namespace PosServer
             //TODO: Process
             try
             {
-                if(request.to != "0"){
+                if(request.To != "0"){
                 AddMessage(request);
-                response.msg = "OK";
+                response.Msg = "OK";
                 }
                 else{
-                    String[] arrayAux = request.msg.split(" ");
+                    String[] arrayAux = request.Msg.Split(" ");
                     switch(arrayAux[0]){
 
                         case "LIST":
@@ -192,15 +192,17 @@ namespace PosServer
                             break;
 
                         case "RETR":
-                            response = RetrMessage(request.From, arrayAux[1]);
+                            response = RetrMessage(request.From, Int32.Parse(arrayAux[1]));
                             break;
                     }
                 }
+                return response;
             }
             catch (System.Exception)
             {
                 return response;
-            } 
+            }
+
         }
 
         public static int Main(String[] args)
