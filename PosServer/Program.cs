@@ -150,8 +150,19 @@ namespace PosServer
             try
             {
                 List<Message> numCorreos = repo[toClient];
-                sb.AppendFormat("Tienes {0} Mensajes", numCorreos.Count);
-                return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };  
+                int cont = 0;
+                foreach (var i in repo[toClient])
+                {
+                    //Console.WriteLine(i);
+                    sb.AppendFormat("{0}: {1}", cont, i.Msg);
+                    sb.AppendLine();
+                    cont++;
+                }
+                if(cont == 0){
+                    return new Message { From = "0", To = toClient, Msg = "No hay mensajes", Stamp = "Server" };
+                }else{
+                    return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };  
+                }
             }
             catch (System.Exception)
             {
@@ -164,11 +175,20 @@ namespace PosServer
 
         public static Message RetrMessage(string toClient, int index)
         {
-            Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
             //TODO: Retr Message
+            try
+            {
+                List<Message> msg = repo[toClient];
+                Message rep = new Message { From = "0", To = toClient, Msg = msg[index].Msg, Stamp = "Server" };
+                msg.RemoveAt(index);
+                return rep;  
 
-            return msg;
+            }
+            catch (System.Exception)
+            {
+                return new Message { From = "0", To = toClient, Msg = "No existe", Stamp = "Server" };
+            }
         }
 
         public static Message Process(Message request)
@@ -178,13 +198,17 @@ namespace PosServer
                 Message response = new Message();
                 if(request.Msg == "LIST"){
                     response = ListMessages(request.From);
-                }else if(request.To.Contains("RETR")){
-
+                }else if(request.Msg.Contains("RETR")){
+                    var pos = request.Msg.Split(" ");
+                    response = RetrMessage(request.From, Int32.Parse(pos[1]));
                 }else{
                     //Añadir mensage
                     AddMessage(request);
                     response = new Message { From = "0", To = request.From, Msg = "OK", Stamp = "Server" };
                 }
+
+
+                
                 return response;
             } catch {
                 return new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
