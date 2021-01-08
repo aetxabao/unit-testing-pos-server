@@ -134,6 +134,12 @@ namespace PosServer
         public static void AddMessage(Message message)
         {
             //TODO: Add Message
+            if (repo.ContainsKey(message.To)) {
+                repo[message.To].Add(message);
+            }
+            else {
+                repo.Add(message.To, new List<Message>{message});
+            }
         }
 
         public static Message ListMessages(string toClient)
@@ -141,7 +147,7 @@ namespace PosServer
             StringBuilder sb = new StringBuilder();
 
             //TODO: List Messages
-
+            
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
 
@@ -150,7 +156,7 @@ namespace PosServer
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
             //TODO: Retr Message
-
+            
             return msg;
         }
 
