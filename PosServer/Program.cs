@@ -135,8 +135,10 @@ namespace PosServer
         {
             //Message m1 = new Message { From = "22", To = "11", Msg = "Adeu!", Stamp = "A.E." }
             //TODO: Add Message
+            List<Message> mensajes = new List<Message>();
             if(!repo.ContainsKey(message.To)){
-                repo.Add(message.To, new List<Message>());
+                mensajes.Add(message);
+                repo.Add(message.To, mensajes);
             }
             else{
                 repo[message.To].Add(message);
@@ -149,19 +151,22 @@ namespace PosServer
             StringBuilder sb = new StringBuilder();
 
             //TODO: List Messages
-            for (int i = 0; i < repo.Count; i ++){
-                if(repo.ContainsKey(toClient)){
-                    foreach(Message msg in repo[toClient]){
-                        sb.Append($"[{i}] From: {msg.From}\n");
-                    }
+            var i = 0;
+            if(repo.ContainsKey(toClient)){
+                List<Message> mensajes = repo[toClient];
+                System.Console.WriteLine(mensajes.Count);
+                foreach(Message msg in mensajes){
+                    sb.Append($"[{i}] From: {msg.From}\n");
+                    i++;
                 }
             }
-            return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
+            return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server\n" };
+            
         }
 
         public static Message RetrMessage(string toClient, int index)
         {
-            Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
+            Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server\n" };
 
             //TODO: Retr Message
             if(repo.ContainsKey(toClient)){
@@ -174,7 +179,7 @@ namespace PosServer
 
         public static Message Process(Message request)
         {
-            Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
+            Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server\n" };
 
             //TODO: Process
             try
@@ -202,7 +207,6 @@ namespace PosServer
             {
                 return response;
             }
-
         }
 
         public static int Main(String[] args)
