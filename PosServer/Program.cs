@@ -131,8 +131,9 @@ namespace PosServer
             return response;
         }
 
-        public static void AddMessage(Message message)
+        public static Message AddMessage(Message message)
         {
+            Message mensaje = new Message {To = "0", From = message.To, Msg = "OKAY", Stamp = "Server"};
             //TODO: Add Message
             if (repo.ContainsKey(message.To)) {
                 repo[message.To].Add(message);
@@ -140,6 +141,8 @@ namespace PosServer
             else {
                 repo.Add(message.To, new List<Message>{message});
             }
+
+            return mensaje;
         }
 
         public static Message ListMessages(string toClient)
@@ -175,7 +178,15 @@ namespace PosServer
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
             //TODO: Process
-            
+            if (request.To != "0") {
+                response = AddMessage(request);
+            } else {
+                if (request.Msg == "LIST") {
+
+                } else if (request.Msg.StartsWith("RETR")) {
+
+                }
+            }
             return response;
         }
 
