@@ -182,9 +182,10 @@ namespace PosServer
                 response = AddMessage(request);
             } else {
                 if (request.Msg == "LIST") {
-
+                    response = ListMessages(request.To);
                 } else if (request.Msg.StartsWith("RETR")) {
-
+                    int num = Int32.Parse(request.Msg.Substring(4, 1));
+                    response = RetrMessage(request.To, num);
                 }
             }
             return response;
