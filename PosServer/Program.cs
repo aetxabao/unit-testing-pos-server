@@ -133,14 +133,32 @@ namespace PosServer
 
         public static void AddMessage(Message message)
         {
+            String clave = message.To;
+            if (repo.ContainsKey(clave)) {
+                repo[clave].Add(message);
+            } 
+            else {
+                List<Message> lista = new List<Message>();
+                lista.Add(message);
+                repo.Add(clave, lista);
+            }
             //TODO: Add Message
         }
 
         public static Message ListMessages(string toClient)
         {
+            var i = 0;
             StringBuilder sb = new StringBuilder();
 
             //TODO: List Messages
+            if (repo.ContainsKey(toClient)) {
+                List<Message> lista = repo[toClient];
+                while (i < lista.Count) {
+                    sb.Append("[" + i + "] From: " + lista[i].From + "\n");
+                    i++;
+                }
+                
+            }
 
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
@@ -150,6 +168,14 @@ namespace PosServer
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
             //TODO: Retr Message
+            if (repo.ContainsKey(toClient) && repo[toClient].Count > index) {
+                List<Message> lista = repo[toClient];
+                msg = lista[index];
+                lista.Remove(msg);
+                repo[toClient] = lista;
+            }
+
+            
 
             return msg;
         }
@@ -159,6 +185,22 @@ namespace PosServer
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
             //TODO: Process
+            String[] msg = request.Msg.Split();
+            int n;
+
+            if (request.Msg == "LIST") {
+                response = ListMessages(request.From);
+            }
+            else if (msg[0] == "RETR" && int.TryParse(msg[1], out n)) {
+                if (n >= 0)
+                {
+                    response = RetrMessage(request.From, n);
+                }
+            } 
+            else if (int.Parse(request.To) > 0 && int.Parse(request.From) > 0) {
+                AddMessage(request);
+                response = new Message { From = "0", To = request.From, Msg = "OK", Stamp = "Server" };
+            }
 
             return response;
         }
