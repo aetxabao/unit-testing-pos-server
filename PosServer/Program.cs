@@ -169,6 +169,14 @@ namespace PosServer
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
             //TODO: Retr Message
+                //Condicion similar al anterior pero lo unico que se añade a este es si la cantidad de los mensajes es mayor que 0 
+                //Eso significa que hay mensajes ya que el index al inicializarse es 0 como todas las variables porque no se le da un valor de inicio
+               if(repo.ContainsKey(toClient) && repo[toClient].Count > index)
+            {
+                //Cuando cumple la condicion borra el mensaje que hay en dicha posicion
+                msg = repo[toClient][index];
+                repo[toClient].RemoveAt(index);
+            }
 
             return msg;
         }
