@@ -147,10 +147,20 @@ namespace PosServer
 
         public static Message ListMessages(string toClient)
         {
+            // i es la posicion  del substring de cada mensaje From
+            int i = 0;
             StringBuilder sb = new StringBuilder();
 
             //TODO: List Messages
 
+            //Condicion en la que comienza la Lista de los mensajes si estos estan en dicha lista
+            if (repo.ContainsKey(toClient))
+            {
+               foreach(Message mensaje in repo[toClient])
+               {
+                   sb.Append($"[{i++}] From: {mensaje.From}");
+               }
+            }
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
 
