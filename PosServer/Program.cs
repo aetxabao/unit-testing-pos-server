@@ -141,7 +141,6 @@ namespace PosServer
                 list.Add(message);
                 repo.Add(to, list);
             }
-            Console.WriteLine(repo[to][0]);
         }
 
         public static Message ListMessages(string toClient)
