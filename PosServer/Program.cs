@@ -133,7 +133,7 @@ namespace PosServer
 
         public static void AddMessage(Message message)
         {
-          //TODO: Add Message
+            //TODO: Add Message
           //Repo es la lista de mensajes , si esta lista no contiene el mensaje , 
           //añadiremos el mensaje que escribamos desde el cliente (message.To , asi hacemos referencia al cliente)
           if (!repo.ContainsKey(message.To)){
@@ -184,6 +184,8 @@ namespace PosServer
         public static Message Process(Message request)
         {
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
+            
+            //TODO: Process
             //Si no tiene solicitudes nos dara error 
             if (request.To == "0")
             {
