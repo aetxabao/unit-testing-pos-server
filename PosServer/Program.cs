@@ -133,7 +133,16 @@ namespace PosServer
 
         public static void AddMessage(Message message)
         {
-            //TODO: Add Message
+            if (repo.ContainsKey(message.To))
+            {
+                repo[message.To].Add(message);
+            }
+            else
+            {
+                List<Message> list = new List<Message>();
+                list.Add(message);
+                repo.Add(message.To, list);
+            }
         }
 
         public static Message ListMessages(string toClient)
