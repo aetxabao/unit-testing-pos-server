@@ -133,14 +133,29 @@ namespace PosServer
 
         public static void AddMessage(Message message)
         {
-            //TODO: Add Message
+            if(repo.ContainsKey(message.To)){
+                repo[message.To].Add(message);
+            }else{
+                List<Message> list = new List<Message>();
+                list.Add(message);
+                repo.Add(message.To, list);
+            }
         }
 
         public static Message ListMessages(string toClient)
         {
             StringBuilder sb = new StringBuilder();
 
-            //TODO: List Messages
+            if(repo.ContainsKey(toClient)){
+                List<Message> listMsg = repo[toClient];
+                for (int i = 0; i < listMsg.Count; i++)
+                {
+                    sb.AppendFormat("[{0}] From: {1}\n", i, listMsg[i].From);
+                }
+            }else{
+                sb.Append("");
+            }
+
 
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
@@ -149,8 +164,13 @@ namespace PosServer
         {
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
-            //TODO: Retr Message
-
+            if(repo.ContainsKey(toClient)){
+                List<Message> lstMsg = repo[toClient];
+                if(index <= (lstMsg.Count - 1)){
+                    msg = lstMsg[index];
+                    lstMsg.RemoveAt(index);
+                }
+            }
             return msg;
         }
 
@@ -158,8 +178,26 @@ namespace PosServer
         {
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
-            //TODO: Process
-
+            if(request.To != "0"){
+                AddMessage(request);
+                response = new Message { From = "0", To = request.From, Msg = "OK", Stamp = "Server" };
+            }else{
+                String cuerpo = request.Msg;
+                if(cuerpo == "LIST"){
+                    response = ListMessages(request.From);
+                }
+                if(cuerpo.Split()[0] == "RETR"){
+                    string indexString = request.Msg.Split()[1];
+                    bool isInt = int.TryParse(indexString, out _);
+                    int index = -1;
+                    if(isInt){
+                        index = int.Parse(indexString);
+                    }
+                    if(index >= 0){
+                        response = RetrMessage(request.From, index);
+                    }
+                }
+            }
             return response;
         }
 
