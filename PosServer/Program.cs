@@ -163,9 +163,11 @@ namespace PosServer
         public static Message RetrMessage(string toClient, int index)
         {
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
-
-            //TODO: Retr Message
-
+            if (repo.ContainsKey(toClient) && repo[toClient].Count >= index)
+            {
+                msg = repo[toClient][index];
+                repo[toClient].RemoveAt(index);
+            }
             return msg;
         }
 
