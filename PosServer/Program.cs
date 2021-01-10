@@ -145,16 +145,16 @@ namespace PosServer
 
         public static Message ListMessages(string toClient)
         {
-            StringBuilder sb = new StringBuilder();
             //TODO: List Messages
             try
             {
+                StringBuilder sb = new StringBuilder();
                 List<Message> numCorreos = repo[toClient];
                 int cont = 0;
                 foreach (var i in repo[toClient])
                 {
                     //Console.WriteLine(i);
-                    sb.AppendFormat("{0}: {1}", cont, i.Msg);
+                    sb.AppendFormat("[{0}] From: {1}", cont, i.From);
                     sb.AppendLine();
                     cont++;
                 }
@@ -166,8 +166,7 @@ namespace PosServer
             }
             catch (System.Exception)
             {
-                sb.Append("El usuario no existe");
-                return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
+                return new Message { From = "0", To = toClient, Msg = "El usuario no existe", Stamp = "Server" };
             }
 
             
@@ -194,8 +193,8 @@ namespace PosServer
         public static Message Process(Message request)
         {
             //TODO: Process
+            Message response;
             try{
-                Message response = new Message();
                 if(request.Msg == "LIST"){
                     response = ListMessages(request.From);
                 }else if(request.Msg.Contains("RETR")){
@@ -206,14 +205,10 @@ namespace PosServer
                     AddMessage(request);
                     response = new Message { From = "0", To = request.From, Msg = "OK", Stamp = "Server" };
                 }
-
-
-                
-                return response;
             } catch {
-                return new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
+                response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
             }
-
+            return response;
         }
 
         public static int Main(String[] args)
