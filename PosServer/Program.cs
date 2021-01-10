@@ -184,8 +184,25 @@ namespace PosServer
         public static Message Process(Message request)
         {
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
-
-            //TODO: Process
+            //Si no tiene solicitudes nos dara error 
+            if (request.To == "0")
+            {
+                //La solicitud es lo que ponemos dentro del metodo message en Msg o LIST o RETR
+                String solicitud =  request.Msg;
+                AddMessage(request);
+                solicitud  = "OK";
+                //Analizaremos si la solicitud es RETR
+                //Pongo el Indice 1 ya que es la segunda solicitud que se ejecuta, la 0 es LIST
+                if (solicitud == "RETR"){
+                    response = RetrMessage(request.From, 1);
+                }
+                //Analizaremos si la solicitud es LIST
+                else if(solicitud == "LIST"){
+                        response = ListMessages(request.From);
+                }
+            }
+                
+        
 
             return response;
         }
