@@ -146,10 +146,16 @@ namespace PosServer
         public static Message ListMessages(string toClient)
         {
             StringBuilder sb = new StringBuilder();
-
+            
             //TODO: List Messages
+            if (repo.ContainsKey(toClient)) {
+                List<Message> lista = repo[toClient];
+                for (int i = 0; i < lista.Count; i++) {
+                    sb.Append("[" + i + "] From: " + lista[i].From + "\n");
+                }
+            }
 
-            return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
+            return new Message {From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
 
         public static Message RetrMessage(string toClient, int index)
@@ -157,6 +163,12 @@ namespace PosServer
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
             //TODO: Retr Message
+            List<Message> lista = repo[toClient];
+            
+            if(repo.ContainsKey(toClient) && lista.Count > index) {
+                msg = lista[index];
+                lista.RemoveAt(index);
+            }
 
             return msg;
         }
@@ -166,7 +178,19 @@ namespace PosServer
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
             //TODO: Process
-
+            String[] str = request.Msg.Split(" ");
+            switch (request.Msg) {
+                case "LIST":
+                    response = ListMessages(request.From);
+                    break;
+                case "RETR":
+                    response = RetrMessage(request.From, int.Parse(str[1]));
+                    break;
+                default:
+                     AddMessage(request);
+                     response = new Message { From = "0", To = request.From, Msg = "OK", Stamp = "Server" }; 
+                    break;
+            }
             return response;
         }
 
