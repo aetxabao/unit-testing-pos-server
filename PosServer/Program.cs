@@ -134,6 +134,15 @@ namespace PosServer
         public static void AddMessage(Message message)
         {
             //TODO: Add Message
+            List<Message> listaNueva = new List<Message>();
+            listaNueva.Add(message);
+            if (!repo.ContainsKey(message.To)){
+                repo.Add(message.To, listaNueva);
+            }
+            else{
+                repo[message.To].Add(message);
+            }
+
         }
 
         public static Message ListMessages(string toClient)
@@ -141,6 +150,9 @@ namespace PosServer
             StringBuilder sb = new StringBuilder();
 
             //TODO: List Messages
+            for (int c = 0; c < repo[toClient].Count; c++){
+                sb.Append("["+ c +"] " + repo[toClient][c] + "\n");
+            }
 
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
@@ -150,6 +162,13 @@ namespace PosServer
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
             //TODO: Retr Message
+            if(repo.ContainsKey(toClient)){
+                if(index >= 0 && index < repo[toClient].Count){
+                    msg.Msg = repo[toClient][index].Msg;
+                    repo[toClient].RemoveAt(index);
+                }
+            }
+
 
             return msg;
         }
@@ -159,6 +178,23 @@ namespace PosServer
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
             //TODO: Process
+            if(request.To != "0"){
+                AddMessage(request);
+ 
+                response = new Message(){ From = "0", To = request.From, Msg = "OK", Stamp = "Server" };
+            }
+            else{
+                if(request.Msg == "LIST"){
+                    response = ListMessages(request.From);
+                }
+                else if(request.Msg.Contains("RETR ")){
+                    int n = 0;
+                    bool isNumeric = int.TryParse(request.Msg.Substring(request.Msg.LastIndexOf(" ")), out n);
+                    if(isNumeric && n >= 0){
+                        response = RetrMessage(request.From, n);
+                    }
+                }
+            }
 
             return response;
         }
