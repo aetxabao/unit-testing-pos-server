@@ -154,7 +154,6 @@ namespace PosServer
             var i = 0;
             if(repo.ContainsKey(toClient)){
                 List<Message> mensajes = repo[toClient];
-                System.Console.WriteLine(mensajes.Count);
                 foreach(Message msg in mensajes){
                     sb.Append($"[{i}] From: {msg.From}\n");
                     i++;
@@ -169,9 +168,17 @@ namespace PosServer
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server\n" };
 
             //TODO: Retr Message
-            if(repo.ContainsKey(toClient)){
-                msg = repo[toClient][index];
-                repo.Remove(toClient);
+            try{
+                if(repo.ContainsKey(toClient)){
+                    List<Message> mensajes = repo[toClient];
+                    if(index >= 0){
+                        msg = mensajes[index];
+                        repo.Remove(toClient);
+                    }
+                }
+            }
+            catch{
+                return msg;
             }
 
             return msg;
@@ -203,7 +210,7 @@ namespace PosServer
                 }
                 return response;
             }
-            catch (System.Exception)
+            catch
             {
                 return response;
             }
