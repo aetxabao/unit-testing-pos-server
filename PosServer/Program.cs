@@ -131,42 +131,65 @@ namespace PosServer
             return response;
         }
 
-        public static void AddMessage(Message message)
-        {
-            //TODO: Add Message
+        public static void AddMessage(Message msg) {
+            if(!repo.ContainsKey(msg.To)) {
+                repo.Add(msg.To, new List<Message>());
+            }
+            repo[msg.To].Add(msg);
         }
 
-        public static Message ListMessages(string toClient)
-        {
+        public static Message ListMessages(string toClient) {
             StringBuilder sb = new StringBuilder();
-
-            //TODO: List Messages
-
-            return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
+            if(repo.ContainsKey(toClient)) {
+                int posi = 0;
+                foreach(Message msg in repo[toClient]) {
+                    sb.Append("[" + posi + "]" + "From:" + msg.From + "\n");
+                    posi++
+                }
+            }
+            return new Message {From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server"};
         }
 
-        public static Message RetrMessage(string toClient, int index)
-        {
-            Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
-
-            //TODO: Retr Message
-
+        public static Message RetrMessage(string toClient, int index) {
+            Message msg = new Message {From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server"};
+            if(repo.ContainsKey(toClient) && repo[toClient].Count >= index + 1) {
+                msg = repo[toClient][index];
+                repo[toClient].RemoveAt(index);
+            }
             return msg;
         }
 
         public static Message Process(Message request)
         {
-            Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
-
-            //TODO: Process
-
+            Message response = new Message {From = "0", To = request.From, Msg = "ERROR", Stamp = "Server"};
+            if(request.To != "0") {
+                AddMessage(request);
+                response.Msg = "OK";
+            }
+            else {
+                string[] collection = request.Msg.Split(' ');
+                string req = collection[0];
+                if(req == "LIST") {
+                    response = ListMessages(request.From);
+                }
+                else if(req == "RETR") {
+                    bool isConvertible = false;
+                    int myInt = 0;
+                    isConvertible = int.TryParse(collection[1], out myInt);
+                    if(isConvertible) {
+                        response = RetrMessage(request.From, myInt);
+                    } else {
+                        response.Msg = "ERROR";
+                    }
+                }
+            }
             return response;
         }
 
         public static int Main(String[] args)
         {
             StartListening();
-            return 0;
+            return 0;   
         }
     }
 }
