@@ -133,8 +133,17 @@ namespace PosServer
 
         public static void AddMessage(Message message)
         {
-            //TODO: Add Message
+          //TODO: Add Message
+          //Repo es la lista de mensajes , si esta lista no contiene el mensaje , 
+          //añadiremos el mensaje que escribamos desde el cliente (message.To , asi hacemos referencia al cliente)
+          if (!repo.ContainsKey(message.To)){
+              repo.Add(message.To, new List<Message>());
+
+          }
+          repo[message.To].Add(message);
+         
         }
+        
 
         public static Message ListMessages(string toClient)
         {
