@@ -174,9 +174,32 @@ namespace PosServer
         public static Message Process(Message request)
         {
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
-
-            //TODO: Process
-
+            if (!request.To.Equals("0"))
+            {
+                AddMessage(request);
+                response.Msg = "OK";
+            }
+            else
+            {
+                String str = request.Msg.Split(' ')[0];
+                if (str.Equals("LIST"))
+                {
+                    response = ListMessages(request.From);
+                }
+                else if (str.Equals("RETR"))
+                {
+                    String aux = request.Msg.Split(' ')[1];
+                    int index = 0;
+                    if (int.TryParse(aux, out _))
+                    {
+                        index = int.Parse(aux);
+                    }
+                    if (index >= 0)
+                    {
+                        response = RetrMessage(request.From, index);
+                    }
+                }
+            }
             return response;
         }
 
