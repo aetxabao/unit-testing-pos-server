@@ -87,7 +87,7 @@ namespace PosServer
 
                     Message request = Receive(handler);
 
-                    Console.WriteLine(request);//Print it
+                    Console.WriteLine(request); //Print it
 
                     Message response = Process(request);
 
@@ -133,14 +133,23 @@ namespace PosServer
 
         public static void AddMessage(Message message)
         {
-            //TODO: Add Message
+            //añadir mensaje a la lista
+            if (!repo.ContainsKey(message.To))
+                repo.Add(message.To, new List<Message>());
+
+            repo[message.To].Add(message);
         }
 
         public static Message ListMessages(string toClient)
         {
             StringBuilder sb = new StringBuilder();
 
-            //TODO: List Messages
+            if (repo.ContainsKey(toClient)){
+                int i = 0;
+                foreach (Message msg in repo[toClient]){
+                    sb.Append($"[{i++}] From: {msg.From}\n");
+                }
+            }
 
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
@@ -149,7 +158,10 @@ namespace PosServer
         {
             Message msg = new Message { From = "0", To = toClient, Msg = "NOT FOUND", Stamp = "Server" };
 
-            //TODO: Retr Message
+            if(repo.ContainsKey(toClient) && repo[toClient].Count >= index + 1){
+                msg = repo[toClient][index];
+                repo[toClient].RemoveAt(index);
+            }
 
             return msg;
         }
@@ -158,7 +170,22 @@ namespace PosServer
         {
             Message response = new Message { From = "0", To = request.From, Msg = "ERROR", Stamp = "Server" };
 
-            //TODO: Process
+            if(request.To != "0"){
+                AddMessage(request);
+                response.Msg = "OK";
+            }else{
+                string orden = request.Msg.Split(' ')[0];
+
+                if(orden == "LIST"){
+                    response = ListMessages(request.From);
+                }else if(orden == "RETR"){
+                    try{
+                        response = RetrMessage(request.From, int.Parse(request.Msg.Split(' ')[1]));
+                    }catch (Exception ex){
+                        response.Msg = "ERROR";
+                    }
+                }
+            }
 
             return response;
         }
