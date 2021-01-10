@@ -148,9 +148,15 @@ namespace PosServer
         public static Message ListMessages(string toClient)
         {
             StringBuilder sb = new StringBuilder();
-
-            //TODO: List Messages
-
+            if (repo.ContainsKey(toClient))
+            {
+                int i = 0;
+                foreach (Message msg in repo[toClient])
+                {
+                    sb.Append($"[{i}] FROM: {msg.From}\n");
+                    i++;
+                }
+            }
             return new Message { From = "0", To = toClient, Msg = sb.ToString(), Stamp = "Server" };
         }
 
